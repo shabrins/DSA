@@ -1,0 +1,23 @@
+[main] linkedListTestRunner 1000 (0) exception: trapped!
+[main] linkedListTestRunner 1000 (0) exception: code 0xC0000005 at 0x6105AA58
+[main] linkedListTestRunner 1000 (0) exception: ax 0x10 bx 0xA031938 cx 0x10 dx 0x0
+[main] linkedListTestRunner 1000 (0) exception: si 0x1 di 0x0 bp 0x244FD54 sp 0x244FD28
+[main] linkedListTestRunner 1000 (0) exception: exception is: STATUS_ACCESS_VIOLATION
+[main] linkedListTestRunner 1000 (0) stack: Stack trace:
+[main] linkedListTestRunner 1000 (0) stack: frame 0: sp = 0x244F8C8, pc = 0x6100A2C3
+[main] linkedListTestRunner 1000 (0) stack: frame 1: sp = 0x244F904, pc = 0x77E6B499
+[main] linkedListTestRunner 1000 (0) stack: frame 2: sp = 0x244F928, pc = 0x77E6B46B
+[main] linkedListTestRunner 1000 (0) stack: frame 3: sp = 0x244F9D8, pc = 0x77E20133
+[main] linkedListTestRunner 1000 (0) stack: frame 4: sp = 0x244FD54, pc = 0x6101A516
+[main] linkedListTestRunner 1000 (0) stack: frame 5: sp = 0x244FD68, pc = 0x401BEE
+[main] linkedListTestRunner 1000 (0) stack: frame 6: sp = 0x244FD84, pc = 0x40171A
+[main] linkedListTestRunner 1000 (1) stack: frame 7: sp = 0x244FDA8, pc = 0x401374
+[main] linkedListTestRunner 1000 (0) stack: frame 8: sp = 0x244FDB0, pc = 0x61004402
+[main] linkedListTestRunner 1000 (0) stack: frame 9: sp = 0x244FF50, pc = 0x61004420
+[main] linkedListTestRunner 1000 (0) stack: frame 10: sp = 0x244FF5C, pc = 0x401D9E
+[main] linkedListTestRunner 1000 (0) stack: frame 11: sp = 0x244FF6C, pc = 0x40103A
+[main] linkedListTestRunner 1000 (0) stack: frame 12: sp = 0x244FF88, pc = 0x76B2336A
+[main] linkedListTestRunner 1000 (0) stack: frame 13: sp = 0x244FF94, pc = 0x77E49F72
+[main] linkedListTestRunner 1000 (0) stack: frame 14: sp = 0x244FFD4, pc = 0x77E49F45
+[main] linkedListTestRunner 1000 (0) stack: frame 15: sp = 0x244FFEC, pc = 0x0
+[main] linkedListTestRunner 1000 (0) stack: End of stack trace
