@@ -74,6 +74,21 @@ int main(){
 		test_to_sort_array_of_double_elements();
 	tearDown();
 	testEnded();
+	testStarted("test_to_sort_array_of_float_elements");
+	setup();
+		test_to_sort_array_of_float_elements();
+	tearDown();
+	testEnded();
+	testStarted("test_to_sort_array_of_string_elements");
+	setup();
+		test_to_sort_array_of_string_elements();
+	tearDown();
+	testEnded();
+	testStarted("test_to_sort_array_of_char_elements");
+	setup();
+		test_to_sort_array_of_char_elements();
+	tearDown();
+	testEnded();
 
 	summarizeTestCount();
 	fixtureTearDown();
