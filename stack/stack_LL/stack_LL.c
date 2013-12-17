@@ -1,20 +1,18 @@
 #include "stack_LL.h"
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include "linkedList.h"
-
-
-
-int push(SList* S,void* element){
-    int result,index;
-    index = S->length;
-    result = insertElement(S,index,element);
-    return result;
+int pushElement(Stack* front, void* data){
+        insertElement(front, front->length, data);
+        return 1;
 }
-void* pop(SList* S){
-    void* result;
-    int index = S->length-1;
-    result = nodeDeletion(S,index);
-    return result;
-};
+
+void popElement(Stack* front){
+        removeElement(front, front->length-1);
+}
+
+void* peek(Stack* front){
+        Node* head = front->head;
+        while(head->next != NULL){
+                head = head->next;
+        }
+        return head->element;
+}

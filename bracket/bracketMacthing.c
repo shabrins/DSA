@@ -4,48 +4,48 @@
 #include <stdlib.h>
 
 
-void* getElement(Stack* s,int top){
-        return s->elements+top*s->typeSize;
-};
+// void* getElement(Stack* s,int top){
+//         return s->elements+top*s->typeSize;
+// };
 
-Stack* create(int length, int typeSize){
-        Stack* s;
-        s = (Stack*)calloc(sizeof(Stack), 1);
-        s->elements = calloc(typeSize, length);
-        s->typeSize = typeSize;
-        s->length = length;
-        s->top = 0;
-        return s;
-}
+// Stack* create(int length, int typeSize){
+//         Stack* s;
+//         s = (Stack*)calloc(sizeof(Stack), 1);
+//         s->elements = calloc(typeSize, length);
+//         s->typeSize = typeSize;
+//         s->length = length;
+//         s->top = 0;
+//         return s;
+// }
 
-int isEmpty(Stack* stack){
-        if(stack->top)
-                return 0;
-        return 1;
-}
-int isFull(Stack* stack){
-        if(stack->top==stack->length)
-                return 1;
-        return 0;
-}
+// int isEmpty(Stack* stack){
+//         if(stack->top)
+//                 return 0;
+//         return 1;
+// }
+// int isFull(Stack* stack){
+//         if(stack->top==stack->length)
+//                 return 1;
+//         return 0;
+// }
 
-int push(Stack* stack,void* element){
-        if(isFull(stack))
-                return 0;
-        memcpy(getElement(stack,stack->top++),element,stack->typeSize);
-        return 1;
-}
-void* pop(Stack* stack){
-        if(stack -> top ==0) return NULL;
-        return getElement(stack,--(stack->top));
-};
+// int push(Stack* stack,void* element){
+//         if(isFull(stack))
+//                 return 0;
+//         memcpy(getElement(stack,stack->top++),element,stack->typeSize);
+//         return 1;
+// }
+// void* pop(Stack* stack){
+//         if(stack -> top ==0) return NULL;
+//         return getElement(stack,--(stack->top));
+// };
 
-void* peek(Stack* stack){
-        if(isEmpty(stack)) return NULL;
-        return getElement(stack,(stack->top-1));
-}
+// void* peek(Stack* stack){
+//         if(isEmpty(stack)) return NULL;
+//         return getElement(stack,(stack->top-1));
+// }
 
-bool breakMatch(String str){
+int breakMatch(String str){
     Stack* stack;
     const char* input = str;
     void* current;
@@ -57,32 +57,32 @@ bool breakMatch(String str){
                 push(stack, (void*)&input[i]);
         if(input[i]=='}'){
             current = peek(stack);
-            if(NULL==current) return false;
+            if(NULL==current) return 0;
 			if('{' != *(char*)current)
-                return false;
+                return 0;
             else
                 pop(stack);
         }
         if(input[i] == ']'){
             current = peek(stack);
-            if(NULL==current) return false;
+            if(NULL==current) return 0;
             if('[' != *(char*)current)
-                return false;
+                return 0;
             else
                 pop(stack);
         }
         if(input[i]==')'){
             current = peek(stack);
-            if(NULL==current) return false;
+            if(NULL==current) return 0;
 			if('(' == *(char*)current)
                    pop(stack);
             else
-                return false;
+                return 0;
         }
     }
     if(stack->top==0)
-        return true;
+        return 1;
     else
-        return false;
+        return 0;
     return 0;
 }

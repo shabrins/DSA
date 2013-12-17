@@ -114,6 +114,11 @@ int main(){
 		test_to_pop_elements_from_stack_double();
 	tearDown();
 	testEnded();
+	testStarted("test_to_pop_elements_from_stack_String");
+	setup();
+		test_to_pop_elements_from_stack_String();
+	tearDown();
+	testEnded();
 	testStarted("test_to_creat_a_stack_and_dispose");
 	setup();
 		test_to_creat_a_stack_and_dispose();
