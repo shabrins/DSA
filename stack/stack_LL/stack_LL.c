@@ -12,9 +12,9 @@ int push(SList* S,void* element){
     result = insertElement(S,index,element);
     return result;
 }
-// void* pop(SList* S){
-//     void* result;
-//     int index = S->length-1;
-//     result = nodeDeletion(S,index);
-//     return result;
-// };
+void* pop(SList* S){
+    void* result;
+    int index = S->length-1;
+    result = nodeDeletion(S,index);
+    return result;
+};
