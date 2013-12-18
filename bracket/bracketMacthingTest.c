@@ -5,16 +5,16 @@
 
 //create setup, tearDown, fixtureSetup, fixtureTearDown methods if needed
 
-void test_for_bracket_not_matching(){
+void test_for_brackets_that_are_not_matching(){
 	String str = "[([]";
 	ASSERT(breakMatch(str) == 0);
 }
 
-void test_for_bracket_not_matching_for_same_extra_closing_brace(){
+void test_for_same_type_of_bracket_for_extra_closing_brace(){
 	String str = "[]]]]]";
 	ASSERT(breakMatch(str) == 0);
 }
-void test_for_bracket_not_matching_for_diff_extra_closing_brace(){
+void test_for_diff_type_of_bracket_for_extra_closing_brace(){
 	String str = "[]})}";
 	ASSERT(breakMatch(str) == 0);
 }

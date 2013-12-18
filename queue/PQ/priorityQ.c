@@ -5,7 +5,7 @@ List* create(){
     List* list = calloc(sizeof(List),1);
     return list;
 }
-int insertFront(PQueue *process,List *list){
+int insertFront(Node *process,List *list){
     if(list->front == NULL)
         process->next = NULL;
     else process->next = list->front;
@@ -13,8 +13,8 @@ int insertFront(PQueue *process,List *list){
     list->length++;
     return list->length;
 }
-int enqueue(List *list,PQueue *pq,compFunc* compare){
-    PQueue *previous,*next,*temp;
+int enqueueElements(List *list,Node *pq,compFunc* compare){
+    Node *previous,*next,*temp;
     int result;
     temp = list->front;
     if(list->length == 0)
@@ -33,7 +33,7 @@ int enqueue(List *list,PQueue *pq,compFunc* compare){
     };
     return 0;
 }
-int dequeue(List *list){
+int dequeueElements(List *list){
         if(list->length == 0) return 1;
         list->front = list->front->next;
         list->length--;

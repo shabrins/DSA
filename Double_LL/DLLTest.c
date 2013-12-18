@@ -95,8 +95,8 @@ void test_to_insert_and_remove_an_element_from_the_DLL_Multiple_times(){
         ASSERT(insertElement(front, 1, &element3));
         ASSERT(element = *(int*)removeElement(front, 1));
         ASSERT(insertElement(front, 1, &element3));
-        
-}
+
+};
 
 void test_to_remove_an_element_from_between_in_the_DLL(){
         int element=2,element2=3;

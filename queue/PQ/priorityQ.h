@@ -1,18 +1,18 @@
 typedef char String[256];
 
-typedef struct queue{
+typedef struct node{
     void* element;
     int priority;
-    struct queue *next;
-}PQueue;
+    struct node *next;
+}Node;
 
 typedef struct{
-    PQueue *front;
+    Node *front;
     int length;
 }List;
 
 List* create();
 typedef int compFunc(void* , void*);
-int insertFront(PQueue *process,List *list);
-int enqueue(List *list ,PQueue *pq, compFunc* compare);
-int dequeue(List* list);
+int insertFront(Node *process,List *list);
+int enqueueElements(List *list ,Node *pq, compFunc* compare);
+int dequeueElements(List* list);
