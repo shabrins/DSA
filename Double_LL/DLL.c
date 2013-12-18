@@ -54,15 +54,15 @@ int isEmpty(List* front){
         return 0;
 }
 
-int removeElement(List *front, int index){
+void* removeElement(List *front, int index){
         Node *temp,*temp2;
         int count = 1;
         if(index >= front->length)
-                return 0;
+                return NULL;
         if(index == 0){
                 front->head = front->head->next;
                 front->length--;
-                return 1;
+                return temp;
         }
         temp = front->head;
         while(count < index){
@@ -75,7 +75,7 @@ int removeElement(List *front, int index){
                 temp->next->previous = temp;
         free(temp2);
         front->length--;
-        return 1;
+        return temp2->element;
 }
 
 void dispose(List* front){

@@ -1,4 +1,4 @@
-;lktypedef struct{
+typedef struct{
 	void *elements;
 	int top;
 	int typeSize;
