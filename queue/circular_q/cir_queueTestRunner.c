@@ -84,9 +84,9 @@ int main(){
 		test_to_enter_float_element_in_queue();
 	tearDown();
 	testEnded();
-	testStarted("test_to_enter_double_element_in_queuee");
+	testStarted("test_to_enter_double_element_in_queue");
 	setup();
-		test_to_enter_double_element_in_queuee();
+		test_to_enter_double_element_in_queue();
 	tearDown();
 	testEnded();
 	testStarted("test_to_enter_string_element_in_queue");
