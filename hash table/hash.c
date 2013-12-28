@@ -1,99 +1,115 @@
-// #include "hash.h"
-
-// hash_table_t *create_hash_table(int size)
-// {
-//     hash_table_t *new_table;
-    
-//     if (size<1) return NULL; /* invalid size for table */
-
-//     /* Attempt to allocate memory for the table structure */
-//     if ((new_table = malloc(sizeof(hash_value_t))) == NULL) {
-//         return NULL;
-//     }
-    
-//      Attempt to allocate memory for the table itself 
-//     if ((new_table->table = malloc(sizeof(list_t *) * size)) == NULL) {
-//         return NULL;
-//     }
-
-//     /* Initialize the elements of the table */
-//     for(i=0; i<size; i++) new_table->table[i] = NULL;
-
-//     /* Set the table's size */
-//     new_table->size = size;
-
-//     return new_table;
-// }
-#include <stdio.h>
 #include <stdlib.h>
-#include "hash.h"
+#include <stdio.h>
+#include <limits.h>
+#include <string.h>
+ 
+struct entry_s {
+ char *key;
+ char *value;
+ struct entry_s *next;
+};
+typedef struct entry_s entry_t;
+struct hashtable_s {
+ int size;
+ struct entry_s **table;	
+};
+typedef struct hashtable_s hashtable_t;
 
-
-HashTable* createHashTable(int size) {
-    HashTable *Ranking = malloc(sizeof(HashTable));
-
-    /* set the pointer to point to a dynamic array of size 'size' */
-    /* this way you don't have to hardcode the size */
-    Ranking->table = malloc(sizeof(Element) * size); 
-    Ranking->size = size;
-
-    /* initialisation is a bit different because we don't have pointers here */
-    /* only table is a pointer, not its elements */
-     int i;
-     for (i = 0; i < size; i++) {
-         Ranking->table[i].key = 0; 
-         Ranking->table[i].value = 0;
-     }
-
-    return Ranking;
+hashtable_t *ht_create( int size ) {
+	hashtable_t *hashtable = NULL;
+	int i;
+ 	if( size < 1 ) return NULL;
+	if((hashtable = malloc( sizeof( hashtable_t ) ) ) == NULL ) 
+		return NULL;
+	if( ( hashtable->table = malloc( sizeof( entry_t * ) * size ) ) == NULL ) 
+		return NULL;
+	for( i = 0; i < size; i++ ) 
+		hashtable->table[i] = NULL;
+ 	hashtable->size = size;
+ 	return hashtable;	
 }
-
-/* I implemented a fake hashFunction just to test the code */
-/* all it does is make sure the key does not exceed the size of the table */
-int hashFunction(int key, int size)
-{
-    return (key % size);
+int ht_hash( hashtable_t *hashtable, char *key ) {
+ 	unsigned long int hashval;
+	int i = 0;
+ 
+	while( hashval < ULONG_MAX && i < strlen( key ) ) {
+		hashval = hashval << 8;
+		hashval += key[i];
+		i++;
+	}
+	return hashval % hashtable->size;
 }
-
-//Insert element
-void insertElement(HashTable *Ranking, int key, int value) {
-
-    int h = hashFunction(key, Ranking->size);
-    int i = 0;
-
-    /* if hash is full and key doesn't exist your previous loop would have gone on forever, I've added a check */
-    /* also notice that I check if table[h] has empty key, not if it's null as this is not a pointer */
-    while(Ranking->table[h].key != 0 && (i < Ranking->size)) {
-
-        if(Ranking->table[h].key == key) {
-            Ranking->table[h].value = value;
-            return; /* break is intended to quit the loop, but actually we want to exit the function altogether */
-        }
-
-        h = (h + 1) % Ranking->size; /* changed 11 to the size specified */
-        i++; /* advance the loop index */
-    }
-
-    /* okay found a free slot, store it there */
-    if(Ranking->table[h].key == 0) {
-        /* we now do direct assignment, no need for pointers */
-        Ranking->table[h].key = key;
-        Ranking->table[h].value = value;
-    }
+entry_t *ht_newpair( char *key, char *value ) {
+	entry_t *newpair;
+	if( ( newpair = malloc( sizeof( entry_t ) ) ) == NULL ) 
+		return NULL;
+	 
+	if( ( newpair->key = strdup( key ) ) == NULL ) 
+		return NULL;
+	 
+	if( ( newpair->value = strdup( value ) ) == NULL ) 
+		return NULL;
+	newpair->next = NULL;
+	return newpair;
 }
+ 
+void ht_set( hashtable_t *hashtable, char *key, char *value ) {
+	int bin = 0;
+	entry_t *newpair = NULL;
+	entry_t *next = NULL;
+	entry_t *last = NULL;
+	bin = ht_hash( hashtable, key );
+	next = hashtable->table[ bin ];
+	while( next != NULL && next->key != NULL && strcmp( key, next->key ) > 0 ) {
+		last = next;
+		next = next->next;
+	}
+	if( next != NULL && next->key != NULL && strcmp( key, next->key ) == 0 ) {
+	 	free( next->value );
+		next->value = strdup( value );
+	} 
+	else {
+		newpair = ht_newpair( key, value );
+		if( next == hashtable->table[ bin ] ) {
+			newpair->next = next;
+			hashtable->table[ bin ] = newpair;
+		}
+		else if ( next == NULL ) {
+			last->next = newpair;
+		} 
+		else {
+			newpair->next = next;
+			last->next = newpair;
+		}
+	}
+}
+ 
+char *ht_get( hashtable_t *hashtable, char *key ) {
+	int bin = 0;
+	entry_t *pair;
+	bin = ht_hash( hashtable, key );
+	 
+	pair = hashtable->table[ bin ];
+	while( pair != NULL && pair->key != NULL && strcmp( key, pair->key ) > 0 ) 
+		pair = pair->next;
+	if( pair == NULL || pair->key == NULL || strcmp( key, pair->key ) != 0 ) 
+		return NULL;
+	else 
+		return pair->value;
+}
+ 2
+int main( int argc, char **argv ) {
+ 	hashtable_t *hashtable = ht_create( 65536 );
+	ht_set( hashtable, "key1", "inky");
+	ht_set( hashtable, "key2", "pinky");
+	ht_set( hashtable, "key3", "blinky");
+	ht_set( hashtable, "key4", "floyd");
+	ht_set( hashtable, "key5", "raj");
 
-int main() {
-
-    int size = 0;
-    scanf(" %d", &size);
-
-    HashTable *Ranking = createHashTable(size);
-
-    insertElement(Ranking, 113, 10); /* this is just a test, 113 will be hashed to be less than size */
-
-    /* we free everything we have malloc'ed */
-    free(Ranking->table);
-    free(Ranking);
-
-    return 0;
+	printf( "%s\n", ht_get( hashtable, "key1" ) );
+	printf( "%s\n", ht_get( hashtable, "key2" ) );
+	printf( "%s\n", ht_get( hashtable, "key3" ) );
+	printf( "%s\n", ht_get( hashtable, "key4" ) );
+	printf("%s\n",ht_get(hashtable, "key5") );
+	return 0;
 }

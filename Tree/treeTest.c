@@ -1,118 +1,126 @@
 #include "testUtils.h"
 #include "tree.h"
 #include <stdlib.h>
-#include <stdio.h>
-const int INSERT_SUCCESSFUL = 1;
-int compareInts(void *a,void *b){
-	return *(int*)a - *(int*)b;
+//create setup, tearDown, fixtureSetup, fixtureTearDown methods if needed
+
+
+int areNodesEqualInt(void* ID, void* data){
+        return (*(int*)ID == *(int*)data);
 }
-void test_insert_root_node(){
-	Tree tree = createTree(compareInts);
-	int data = 2;
-	int result = insertToTree(&tree, NULL, &data);
-	ASSERT(INSERT_SUCCESSFUL == result);
+
+Tree tree;
+int SUCCESS = 1;
+int FAILURE = 0;
+
+void setup(){
+	tree = createTree(areNodesEqualInt);
 }
-void test_insert_node_under_root_node(){
-	Tree tree = createTree(compareInts);
-	int data[] = {2,3,5};
-	Iterator result;
-	insertToTree(&tree, NULL, &data[0]);
-	insertToTree(&tree, &data[0], &data[1]);
-	insertToTree(&tree, &data[0], &data[2]);
-	result = getChildren(&tree, &data);
-	// printf("%d\n", result.hasNext(&result));
-	ASSERT(5 == *(int*)result.next(&result));
-	ASSERT(3 == *(int*)result.next(&result));
+
+void test_to_insert_root(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
 }
-void test_insert_under_child_node(){
-	Tree tree = createTree(compareInts);
-	int data[] = {2,3,5};
-	Iterator result;
-	insertToTree(&tree, NULL, &data[0]);
-	insertToTree(&tree, &data[0], &data[1]);
-	insertToTree(&tree, &data[1], &data[2]);
-	result = getChildren(&tree, &data[1]);
-	ASSERT(5 == *(int*)result.next(&result));
-}
-void test_insert_under_second_child(){
-	Tree tree = createTree(compareInts);
-	int data0 = 2;
-	int data1[] = {3,5};
-	int data2 = 9;
-	Iterator result;
-	insertToTree(&tree, NULL, &data0);
-	insertToTree(&tree, &data0, &data1[0]);
-	insertToTree(&tree, &data0, &data1[1]);
-	insertToTree(&tree, &data1[1], &data2);
-	result = getChildren(&tree, &data1[1]);
-	ASSERT(9 == *(int*)result.next(&result));
-}
-void test_insert_nodes_from_different_level(){
-	Tree tree = createTree(compareInts);
+
+void test_to_insert_nodes_under_root_node(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 2;
 	Iterator it;
-	int data[7] = {10,12,30,4,45,5,50};
-	ASSERT(insertToTree(&tree, NULL, &data[0]));
-	ASSERT(insertToTree(&tree, &data[0], &data[1]));
-	ASSERT(insertToTree(&tree, &data[1], &data[2]));
-	ASSERT(insertToTree(&tree, &data[2], &data[3]));
-	ASSERT(insertToTree(&tree, &data[3], &data[4]));
-	ASSERT(insertToTree(&tree, &data[4], &data[5]));
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	insertNode(&tree, &elements[0], &elements[2]);
+	it = getChild(&tree, &elements[0]);
+	while(it.hasNext(&it)){
+		ASSERT(elements[count] == *(int*)(it.next(&it)));
+		count--;
+	}
 }
-void test_delete_node_under_root_node_from_tree(){
-	Tree tree = createTree(compareInts);
-	Iterator result;
-	int data[2] = {10,23};
-	ASSERT(insertToTree(&tree, NULL, &data));
-	ASSERT(insertToTree(&tree, &data, &data[1]));
-	ASSERT(deleteFromTree(&tree,&data[1]));
-	result = getChildren(&tree, &data);
-	ASSERT(0 == result.hasNext(&result));
+
+void test_to_insert_multiple_nodes_at_root_node(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 3;
+	Iterator it;
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	insertNode(&tree, &elements[0], &elements[2]);
+	insertNode(&tree, &elements[0], &elements[3]);
+	it = getChild(&tree, &elements[0]);
+	while(it.hasNext(&it)){
+		ASSERT(elements[count] == *(int*)(it.next(&it)));
+		count--;
+	}
 }
-void test_delete_root_node_from_tree(){
-	Tree tree = createTree(compareInts);
-	Iterator result;
-	int data[2] = {10,23};
-	ASSERT(insertToTree(&tree, NULL, &data));
+
+void test_to_insert_child_at_of_root(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 3;
+	Iterator it;
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	insertNode(&tree, &elements[0], &elements[2]);
+	insertNode(&tree, &elements[0], &elements[3]);
+	result = insertNode(&tree, &elements[1], &elements[4]);	
+	ASSERT(result == SUCCESS);
+	it = getChild(&tree, &elements[1]);
+	while(it.hasNext(&it)){
+		ASSERT(5 == *(int*)(it.next(&it)));
+		count++;
+	}
 }
-void test_delete_nodes_from_different_level(){
-	Tree tree = createTree(compareInts);
-	Iterator result;
-	int data[7] = {10,12,30,4,45,5,50};
-	ASSERT(insertToTree(&tree, NULL, &data[0]));
-	ASSERT(insertToTree(&tree, &data[0], &data[1]));
-	ASSERT(insertToTree(&tree, &data[1], &data[2]));
-	ASSERT(insertToTree(&tree, &data[2], &data[3]));
-	ASSERT(insertToTree(&tree, &data[3], &data[4]));
-	ASSERT(insertToTree(&tree, &data[4], &data[5]));
-	ASSERT(deleteFromTree(&tree, &data[5]));
-	result = getChildren(&tree, &data[4]);
-	ASSERT(0 == result.hasNext(&result));
+
+void test_to_insert_child_at_3rd_layer(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 3;
+	Iterator it;
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	insertNode(&tree, &elements[1], &elements[2]);
+	insertNode(&tree, &elements[2], &elements[3]);
+	it = getChild(&tree, &elements[2]);
+	while(it.hasNext(&it)){
+		ASSERT(4 == *(int*)(it.next(&it)));
+		count++;
+	}
 }
-void test_search_element_in_the_tree(){
-	Tree tree = createTree(compareInts);
-	Iterator result;
-	int data[7] = {10,12,30,4,45,5,50};
-	ASSERT(insertToTree(&tree, NULL, &data[0]));
-	ASSERT(insertToTree(&tree, &data[0], &data[1]));
-	ASSERT(insertToTree(&tree, &data[1], &data[2]));
-	ASSERT(insertToTree(&tree, &data[2], &data[3]));
-	ASSERT(insertToTree(&tree, &data[3], &data[4]));
-	ASSERT(insertToTree(&tree, &data[4], &data[5]));
-	ASSERT(searchInTree(&tree,&data[4]));
-	ASSERT(searchInTree(&tree,&data[2]));
-	ASSERT(searchInTree(&tree,&data[0]));
+
+void test_to_check_child_of_a_leaf_node(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 3;
+	Iterator it;
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	insertNode(&tree, &elements[0], &elements[2]);
+	insertNode(&tree, &elements[0], &elements[3]);
+	it = getChild(&tree, &elements[1]);
+	ASSERT(0 == it.hasNext(&it));
+	it = getChild(&tree, &elements[2]);
+	ASSERT(0 == it.hasNext(&it));
+	it = getChild(&tree, &elements[3]);
+	ASSERT(0 == it.hasNext(&it));
 }
-void test_not_search_element_in_the_tree(){
-	Tree tree = createTree(compareInts);
-	Iterator result;
-	int data[7] = {10,12,30,4,45,5,50};
-	ASSERT(insertToTree(&tree, NULL, &data[0]));
-	ASSERT(insertToTree(&tree, &data[0], &data[1]));
-	ASSERT(insertToTree(&tree, &data[1], &data[2]));
-	ASSERT(insertToTree(&tree, &data[2], &data[3]));
-	ASSERT(insertToTree(&tree, &data[3], &data[4]));
-	ASSERT(insertToTree(&tree, &data[4], &data[5]));
-	ASSERT(searchInTree(&tree,&data[4]));
-	ASSERT(searchInTree(&tree,&data[2]));
-	ASSERT(0 == searchInTree(&tree,&data[7]));
+
+void test_to_delete_a_node_under_root_node(){
+	int elements[] = {1,2,3,4,5,6,7,8,9,10};
+	int result ;
+	int count = 1;
+	Iterator it;
+	result = insertNode(&tree, NULL, &elements[0]);
+	ASSERT(SUCCESS == result);
+	insertNode(&tree, &elements[0], &elements[1]);
+	it = getChild(&tree, &elements[0]);
+	while(it.hasNext(&it)){
+		ASSERT(elements[count] == *(int*)(it.next(&it)));
+		count--;
+	}
+	deleteNode(&tree, &elements[1]);
 }

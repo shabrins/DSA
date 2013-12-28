@@ -1,91 +1,91 @@
 #include "tree.h"
-#include "internalTree.h"
 #include <stdlib.h>
-#include <stdio.h>
+typedef struct treenode {
+	struct treenode* parent;
+	void* data;
+	List* children;
+} TreeNode;
 
-TreeNode* getTreeNode(DoubleList list,void *dataToFind,compare cmp){
-	Iterator it = getIterator(&list);
-	TreeNode *tn;
+Tree createTree(int (*compare)(void* ID, void* node)){
+	Tree tree;
+	tree.root = NULL;
+	tree.compare = compare;
+	return tree;
+}
+TreeNode* getNode(TreeNode* parentNode, void* data){
+	TreeNode* treenode = calloc(1, sizeof(TreeNode));
+	treenode->children = create();
+	treenode->parent =  parentNode;
+	treenode->data = data;
+	return treenode;
+}
+
+TreeNode* Traverse(List *list, void* parentData,int (*compare)(void*,void*)){
+	TreeNode* temp;
+	Iterator it = getIterator(list);
 	while(it.hasNext(&it)){
-		tn = (TreeNode*)it.next(&it);
-		if(0 == cmp(tn->data,dataToFind))
-			return tn;
-		if(tn->children.head)
-			return getTreeNode(tn->children, dataToFind, cmp);
+		temp = it.next(&it);
+		if (1 == compare(temp->data,parentData)){
+			return temp;
+		}
+		if(NULL != temp->children->head){
+			return Traverse(temp->children, parentData, compare);
+		}
 	}
 	return NULL;
 }
-TreeNode* createTreeNode(void *data,TreeNode *parent){
-	TreeNode *treeNode = malloc(sizeof(TreeNode));
-	treeNode->data = data;
-	treeNode->parent = parent;
-	treeNode->children = create();
-	return treeNode;
-}
-Tree createTree(compare cmp){
-	Tree tree = {cmp,NULL};
-	return tree;
-}
-int insertToTree(Tree* tree, void* parentData, void* childData) {
-	TreeNode *root = (TreeNode*)tree->root;
-	TreeNode *nodeToInsert, *parentNode;
-	if(NULL == tree->root){
-		tree->root = createTreeNode(childData, NULL);
+
+
+int insertNode(Tree* tree, void* parentData, void* data){
+	TreeNode* parent;
+	TreeNode* treenode;
+	if(parentData == NULL){
+		treenode = getNode(parentData,data);
+		tree->root = create();
+		insert((List*)tree->root, 0, treenode);
 		return 1;
 	}
-	if(0 == tree->cmp(root->data,parentData)){
-		parentNode = root;
-		nodeToInsert = createTreeNode(childData, parentNode);
-		insert(&root->children, 0, nodeToInsert);
-		return 1;
+	parent = Traverse((List*)tree->root,parentData,tree->compare);
+	if(parent == NULL)
+		return 0;
+	treenode = getNode(parent, data);
+	insert(parent->children,0,treenode);
+	return 1;
+
+}
+
+int findIndex(TreeNode* treenode,void* data){
+	Node* temp = treenode->children->head;
+	int index = 0;
+	while (temp->next != NULL){
+
 	}
-	parentNode = getTreeNode(root->children, parentData, tree->cmp);
-	nodeToInsert = createTreeNode(childData, parentNode);
-	insert(&parentNode->children, 0, nodeToInsert);
+
+}
+
+int deleteNode(Tree* tree, void* data){
+	int indexTodelete;
+	TreeNode* treenode = Traverse((List*)tree->root, data, tree->compare);
+	if(treenode->children->head != NULL)
+		return 0;
+	indexTodelete = findIndex(treenode->parent,data);
 	return 1;
 }
-void* treeNext(Iterator *it){
-	TreeNode *node;
-	Iterator treeIterator = getIterator(it->list);
-	treeIterator.position = it->position;
-	node = treeIterator.next(&treeIterator);
+
+void* getChildren(Iterator* it){
+	TreeNode* node;
+	Iterator treeIt = getIterator(it->list);
+	treeIt.position = it->position;
+	node = treeIt.next(&treeIt);
 	it->position++;
 	return node->data;
 }
 
-Iterator getChildren(Tree* tree, void *parent) {
-	TreeNode *temp,*root = (TreeNode*)tree->root;
+Iterator getChild(Tree* tree,  void* data){
+	TreeNode* parentNode;
 	Iterator it;
-	if(0 == tree->cmp(root->data,parent))
-		temp = root;
-	else 
-		temp = getTreeNode(root->children, parent, tree->cmp);
-	it = getIterator(&temp->children);
-	it.next = &treeNext;
+	parentNode = Traverse((List*)tree->root, data,tree->compare);
+	it = getIterator(parentNode->children);
+	it.next = getChildren;
 	return it;
-}
-int deleteFromTree(Tree *tree, void *data){
-	TreeNode *root = (TreeNode*)tree->root;
-	TreeNode *tn,*parent;
-	Iterator it;
-	tn = getTreeNode(root->children, data, tree->cmp);
-	if(0 == tn->children.length){
-		parent = tn->parent;
-		it = getIterator(&parent->children);
-		while(it.hasNext(&it)){
-			if(tree->cmp(data,it.next(&it)))
-				break;
-		}
-		delete(&parent->children, it.position - 1);
-		return 1;
-	}
-	return 0;
-}
-int searchInTree(Tree* tree, void* searchElement){
-    TreeNode* root = (TreeNode*)(tree->root);
-    if(0 == tree->cmp(searchElement,root->data))
-    	return 1;
-    if(NULL != getTreeNode(root->children,searchElement,tree->cmp))
-        return 1;
-    return 0;
 }

@@ -1,18 +1,12 @@
-#include "tree_iterator.h"
-#include "include/iterator.h"
+#include "doubleLL.h"
 
 
-#ifndef _COMPARE_
-#define _COMPARE_
-typedef int (*compare)(void* firstElement, void* secondElement);
-#endif
 typedef struct {
-	compare cmp;
-	void *root;
+	void* root;
+	int (*compare)(void* ID, void * node);
 } Tree;
 
-Tree createTree(compare cmp);
-int insertToTree(Tree* tree, void* parentData, void* data);
-Iterator getChildren(Tree* tree, void* parentData);
-int deleteFromTree(Tree* tree, void* data);
-int searchInTree(Tree* tree, void* data);
+Tree createTree();
+int insertNode(Tree* tree, void* parentData, void* data);
+int deleteNode(Tree* tree, void* data);
+Iterator getChild(Tree* tree, void* data);
