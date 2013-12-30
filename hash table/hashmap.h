@@ -1,20 +1,21 @@
 #include "./include/iterator.h"
-#include "hashMapIterator.h"
 
-#ifndef _hashMap_
-#define _hashMap_
-typedef int (*compareFunc)(void* firstElement, void* secondElement);
-typedef int (*Hash_map)(void *key);
-
+#ifndef _COMPARE_
+#define _COMPARE_
+typedef int (*compare)(void* firstElement, void* secondElement);
+typedef int (*hash)(void *key);
+#endif        
+#ifndef _HASHMAP_
+#define _HASHMAP_
 typedef struct {
-	void *bucket;
-	Hash_map hash;
-	compareFunc areKeyEqueal;
+        void *buckets;
+        hash hashFunc;
+        compare cmp;
 } HashMap;
 
-HashMap createHash(Hash_map hash, compareFunc areKeyEqueal);
-int put(HashMap* map,void* key, void* value);
-void* get(HashMap* map,void* key);
-int remove(HashMap* map , void* kay);
-Iterator keys(HashMap* map);
+HashMap createMap(hash hashFunc, compare compareKey);
+int put(HashMap* map, void* key, void* value);
+void* get(HashMap* map, void* key);
+int remove_hash(HashMap* map, void* key);
+void* keys(HashMap* map);
 #endif
