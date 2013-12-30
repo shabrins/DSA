@@ -49,39 +49,34 @@ int main(){
 	fixtureSetup();
 	resetTestCount();
 
-	testStarted("test_to_insert_root");
+	testStarted("test_Merge_int_array");
 	setup();
-		test_to_insert_root();
+		test_Merge_int_array();
 	tearDown();
 	testEnded();
-	testStarted("test_to_insert_nodes_under_root_node");
+	testStarted("test_should_sort_int_data");
 	setup();
-		test_to_insert_nodes_under_root_node();
+		test_should_sort_int_data();
 	tearDown();
 	testEnded();
-	testStarted("test_to_insert_multiple_nodes_at_root_node");
+	testStarted("test_should_sort_int_data_for_odd_no_of_elements");
 	setup();
-		test_to_insert_multiple_nodes_at_root_node();
+		test_should_sort_int_data_for_odd_no_of_elements();
 	tearDown();
 	testEnded();
-	testStarted("test_to_insert_child_at_of_root");
+	testStarted("test_should_sort_float_data_for_int_no_of_elements");
 	setup();
-		test_to_insert_child_at_of_root();
+		test_should_sort_float_data_for_int_no_of_elements();
 	tearDown();
 	testEnded();
-	testStarted("test_to_insert_child_at_3rd_layer");
+	testStarted("test_to_sort_char_data");
 	setup();
-		test_to_insert_child_at_3rd_layer();
+		test_to_sort_char_data();
 	tearDown();
 	testEnded();
-	testStarted("test_to_check_child_of_a_leaf_node");
+	testStarted("test_to_sort_Account_data");
 	setup();
-		test_to_check_child_of_a_leaf_node();
-	tearDown();
-	testEnded();
-	testStarted("test_to_delete_a_node_under_root_node");
-	setup();
-		test_to_delete_a_node_under_root_node();
+		test_to_sort_Account_data();
 	tearDown();
 	testEnded();
 
@@ -89,6 +84,8 @@ int main(){
 	fixtureTearDown();
 	return 0;
 }
+
+void setup(){}
 
 void tearDown(){}
 
