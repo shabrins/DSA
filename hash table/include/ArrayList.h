@@ -9,8 +9,8 @@ typedef struct {
 } ArrayList;
 
 ArrayList ArrayList_create(int capacity);
-#ifndef _COMPARE_
-#define _COMPARE_
+#ifndef _COMPARE1_
+#define _COMPARE1_
 typedef int (*compare)(void* element1,void *element2);
 #endif
 typedef void ForEach(void* data);

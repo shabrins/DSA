@@ -1,21 +1,30 @@
-#include "./include/iterator.h"
+#include "include/dList.h"
+typedef int CompareFunc(void* first, void* second);
+typedef int HashCodeGeneratorFunc(void* key);
 
-#ifndef _COMPARE_
-#define _COMPARE_
-typedef int (*compare)(void* firstElement, void* secondElement);
-typedef int (*hash)(void *key);
-#endif        
-#ifndef _HASHMAP_
-#define _HASHMAP_
+typedef struct{
+        void* key;
+        void* value;
+} MapNode;
+
 typedef struct {
-        void *buckets;
-        hash hashFunc;
-        compare cmp;
+        List** buckets;
+        int capacity;
+         HashCodeGeneratorFunc* hashCodeGenerator;
+        CompareFunc* comparator;
 } HashMap;
 
-HashMap createMap(hash hashFunc, compare compareKey);
-int put(HashMap* map, void* key, void* value);
-void* get(HashMap* map, void* key);
-int remove_hash(HashMap* map, void* key);
-void* keys(HashMap* map);
-#endif
+typedef struct{
+        List* list;
+        int currentPos;
+} MapIterator;
+
+HashMap* createHashMap(HashCodeGeneratorFunc* hashCodeGenerator, CompareFunc* comparator);
+int putMapNode(HashMap *map, void *key, void *value);
+void* getValue(HashMap *map, void *key);
+int removeMapNode(HashMap *map, void *key);
+int hasNextKey(MapIterator* it);
+void* nextKey(MapIterator* it);
+MapIterator mapKeys(HashMap* map);
+
+void disposeHashMap(HashMap* map);

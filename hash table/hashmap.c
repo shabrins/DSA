@@ -1,84 +1,121 @@
 #include "hashmap.h"
-#include "include/dList.h"
-#include "include/ArrayList.h"
-#include "internalHashMap.h"
 #include <stdlib.h>
-#include <stdio.h>
-void createListForEachBucket(void *bucket){
-        DoubleList list;
-        list = dList_create();
-        *(DoubleList*)bucket = list;
-}
-HashMap createMap(hash hashFunc, compare compareKey){
-        HashMap map;
-        int i;
-        ArrayList buckets = ArrayList_create(10);
-        map.buckets = malloc(sizeof(ArrayList));
-        *(ArrayList*)map.buckets = buckets;
-        map.cmp = compareKey;
-        map.hashFunc = hashFunc;
-        for(i = 0;i < 10;i++)
-                ArrayList_add(map.buckets, malloc(sizeof(DoubleList)));
-        ArrayList_iterate(*(ArrayList*)map.buckets, createListForEachBucket);
+
+HashMap* createHashMap(HashCodeGeneratorFunc* hashCodeGenerator, CompareFunc* comparator){
+        int index;
+        HashMap* map = (HashMap*)calloc(1,sizeof(HashMap));
+        map->capacity = 10;
+        map->buckets = (List**)calloc(map->capacity, sizeof(List*));
+        map->hashCodeGenerator = hashCodeGenerator;
+        map->comparator = comparator;
+        for (index = 0; index < map->capacity; ++index){
+                map->buckets[index] = createList();
+        }
         return map;
 }
-HashNode* createHashNode(void *key, void *value){
-        HashNode *hash_node = malloc(sizeof(HashNode));
-        hash_node->key = key;
-        hash_node->value = value;
-        return hash_node;
-}
-int put(HashMap *map, void *key, void *value){
-        DoubleList *list;
-        HashNode *hash_node;
-        int bucketNumber;
-        bucketNumber = (map->hashFunc(key)) % 10;
-        hash_node = createHashNode(key, value);
-        list = (DoubleList*)ArrayList_get(map->buckets, bucketNumber);
-        dList_insert(list, list->length, hash_node);
-        return 1;
-}
-void* get(HashMap *map, void *key){
-    node* Node;
-    HashNode* data;
-    int i;
-    int bucketNumber = map->hashFunc(key) % 10;
-    DoubleList *list = (DoubleList*)ArrayList_get(map->buckets, bucketNumber);
-    if(0 == list->length) return NULL;
-    Node = (node*)list->head;
-    for(i=0;i<list->length;i++){
-            data = (HashNode*)Node->data;
-        if (!map->cmp(key ,data->key)) return data->value;
-        Node = Node->next;
-    }
-    return NULL;
+
+MapNode* getMapNode(HashMap* map,int bucket,void* key){
+        int index;
+        MapNode* mapNode;
+        List* currentBucket = map->buckets[bucket];
+        for (index = 0; index < currentBucket->length; ++index){
+                mapNode = getElement(currentBucket, index);
+                if(0 == map->comparator(key,mapNode->key))
+                        return mapNode;
+        }
+        return NULL;
 }
 
-int remove_hash(HashMap* map, void* key){
-        int bucketNumber,index = 0;
-        DoubleList* list;
-        HashNode* hash_node;
-        Iterator it;
-        bucketNumber = (map->hashFunc(key)) %10;
-        list = (DoubleList*)ArrayList_get(map->buckets,bucketNumber);
-        it = dList_getIterator(list);
-        while(it.hasNext(&it)){
-                hash_node = it.next(&it);
-                if(0 == map->cmp(hash_node->key,key))
-                        break;
-                index++;
-        }
-        if(index == list->length) return 0;
-        return dList_delete(list,index);
+MapNode* createMapNode(void* key,void* value){
+        MapNode* mapNode = calloc(1, sizeof(MapNode));
+        mapNode->key = key;
+        mapNode->value = value;
+        return mapNode;
 }
-void* keys(HashMap *map){
-        Iterator Arrayiterator = ArrayList_getIterator(map->buckets);
-        Iterator listIterator;
-        HashNode hash_node;
-        while(Arrayiterator.hasNext(&Arrayiterator)){
-                listIterator = dList_getIterator(Arrayiterator.next(&Arrayiterator));
-                while(listIterator.hasNext(&listIterator))
-                        hash_node = (*(HashNode*)listIterator.next(&listIterator));
+
+int putMapNode(HashMap *map, void *key, void *value){
+        int hashCode = map->hashCodeGenerator(key);
+        int bucket = hashCode % map->capacity;
+        List* currentBucket = map->buckets[bucket];
+        MapNode* mapNode = getMapNode(map, bucket, key);
+        if(mapNode == NULL){
+                mapNode = createMapNode(key, value);        
+                return insert(currentBucket,currentBucket->length,mapNode);
         }
-        return hash_node.key;
+        mapNode->value = value;
+        return 1;
+}
+
+void* getValue(HashMap *map, void *key){
+        int hashCode = map->hashCodeGenerator(key);
+        int bucket = hashCode % map->capacity;
+        MapNode* mapNode = getMapNode(map, bucket, key);
+        if (mapNode == NULL) return mapNode;
+        return mapNode->value;
+}
+
+int getPosition(List* list,MapNode* mapNode){
+        int index;
+        for (index = 0; index < list->length; ++index){
+                if(mapNode == getElement(list, index))
+                        return index;
+        }
+        return -1;
+}
+
+int removeMapNode(HashMap *map, void *key){
+        int position;
+        int hashCode = map->hashCodeGenerator(key);
+        int bucket = hashCode % map->capacity;
+        List* currentBucket = map->buckets[bucket];
+        MapNode* mapNode = getMapNode(map, bucket, key);
+        if(mapNode == NULL) return 0;
+        position = getPosition(currentBucket,mapNode);
+        deleteNode(currentBucket, position);
+        free(mapNode);
+        return 1;
+}
+
+int hasNextKey(MapIterator* it){
+        if(it->currentPos == it->list->length) return 0;
+        return 1;
+}
+
+void* nextKey(MapIterator* it){
+        void* key;
+        if(!hasNextKey(it)) return NULL;
+        key = getElement(it->list, it->currentPos);
+        it->currentPos += 1;
+        return key;
+}
+
+
+void addKeysToIterator(List* destList,HashMap* map){
+        int index,inner;
+        List* currentBucket;
+        MapNode* currentMapNode;
+        for (index = 0; index < map->capacity; ++index){
+                currentBucket = map->buckets[index];
+                for(inner = 0;inner < currentBucket->length;inner++){
+                        currentMapNode = getElement(currentBucket, inner);
+                        insert(destList, destList->length, currentMapNode->key);
+                }
+        }
+}
+
+MapIterator mapKeys(HashMap* map){
+        MapIterator mapIt;
+        mapIt.list = createList();
+        mapIt.currentPos = 0;
+        addKeysToIterator(mapIt.list,map);
+        return mapIt;
+}
+
+void disposeHashMap(HashMap* map){
+        int index;
+        for (index = 0; index < map->capacity; ++index){
+                disposeList(map->buckets[index]);
+        }
+        free(map->buckets);
+        free(map);
 }
